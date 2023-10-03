@@ -1,0 +1,23 @@
+#log {
+    background: darkseagreen;
+}
+
+#main {
+    background: lightcoral;
+}
+
+#touch-area {
+    width: auto;
+    display: block;
+    background: blue;
+}
+
+.noscroll * {
+    overflow: hidden;
+}
+
+html, body, #touch-area {
+    min-height: 100vh;
+    width: 100vw;
+    margin: 0;
+}
