@@ -7,17 +7,36 @@
 }
 
 #touch-area {
-    width: auto;
     display: block;
     background: blue;
 }
 
-.noscroll * {
+body, .full {
     overflow: hidden;
 }
 
-html, body, #touch-area {
+html, body, .full {
     min-height: 100vh;
     width: 100vw;
     margin: 0;
+}
+
+#defuse {
+    background: red;
+}
+
+#defuse form {
+    padding: 1em;
+}
+
+#defuse input {
+    font-size: 20vh;
+    text-align: center;
+    width: 2.5ch;
+    margin: auto;
+    display: block;
+}
+
+.disable {
+    display: none;
 }

@@ -11,6 +11,27 @@ async function monitorAccelerometer(threshold) {
     })
 }
 
+const defuseCodeInput = (function () {
+    let defusePromiseResolve = null
+    document.getElementById('defuse-form').addEventListener('submit', event => {
+        event.preventDefault();
+        if (defusePromiseResolve != null) {
+            defusePromiseResolve(parseInt(document.getElementById('defuse-input').value))
+        }
+    })
+    return function () {
+        return new Promise(resolve => {
+            defusePromiseResolve = resolve
+        })
+    }
+})()
+
+function wait(ms) {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(), ms);
+    })
+}
+
 async function connectRtc() {
     const connection = new RTCPeerConnection();
 
@@ -20,6 +41,7 @@ async function monitorTouch() {
     const toleranceRadius = 75;
     const svgNs = "http://www.w3.org/2000/svg";
     const touchArea = document.createElementNS(svgNs, "svg");
+    touchArea.classList.add('full')
     touchArea.id = 'touch-area'
     document.body.appendChild(touchArea)
     let anyTouches = false;
@@ -75,10 +97,33 @@ async function monitorTouch() {
 
 async function main() {
     await Promise.race([monitorTouch()])
-    document.body.style.background = 'red'
-    await connectRtc();
+    let out = await onAlertTrigger(42);
+    console.log('alert cancel:', out)
+    //await connectRtc();
 }
 
+function promptDefuse() {
+    document.getElementById('defuse').classList.remove('disable')
+    setTimeout(() => document.getElementById('defuse-input').focus())
+}
+
+async function onAlertTrigger(code) {
+    promptDefuse()
+    const codeInput = defuseCodeInput()
+    const timeout1 = wait(2000)
+    const timeout2 = wait(4000)
+    const result1 = await Promise.race([codeInput, timeout1]);
+    if (result1 === undefined) {
+        document.getElementById('defuse').style.background = 'black'
+        //timeout
+        const result2 = await Promise.race([codeInput, timeout2]).finally(() => {
+            document.getElementById('defuse').style.background = undefined
+        });
+        return result2 === code
+    } else {
+        return result1 === code
+    }
+}
 
 main().then(() => {
     console.log('main resolved')
