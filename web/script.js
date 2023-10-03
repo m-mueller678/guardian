@@ -96,10 +96,19 @@ async function monitorTouch() {
 }
 
 async function main() {
+    document.getElementById('config-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await arm()
+    })
+}
+
+async function arm() {
+    document.getElementById('config').classList.add('disable')
     await Promise.race([monitorTouch()])
-    let out = await onAlertTrigger(42);
-    console.log('alert cancel:', out)
-    //await connectRtc();
+    const defused = await onAlertTrigger(parseInt(document.getElementById('config-code').value));
+    document.getElementById('defuse').classList.add('disable')
+    console.log('defuse: ', defused)
+    //location.reload();
 }
 
 function promptDefuse() {
@@ -128,5 +137,3 @@ async function onAlertTrigger(code) {
 main().then(() => {
     console.log('main resolved')
 })
-
-console.log('sync')
