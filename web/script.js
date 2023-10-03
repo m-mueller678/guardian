@@ -1,3 +1,5 @@
+const WS_URL = window.location.href.replace('4443','4444').replace('https','wss')
+
 async function monitorAccelerometer(threshold) {
     const acl = new Accelerometer({frequency: 60.0})
     await new Promise(resolve => {
@@ -96,10 +98,11 @@ async function monitorTouch() {
 }
 
 async function main() {
-    document.getElementById('config-form').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        await arm()
-    })
+    // document.getElementById('config-form').addEventListener('submit', async (event) => {
+    //     event.preventDefault();
+    //     await arm()
+    // })
+    const connection = new WebSocket(WS_URL)
 }
 
 async function arm() {
