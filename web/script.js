@@ -1,4 +1,4 @@
-const WS_URL = window.location.href.replace('4443','4444').replace('https','wss')
+const WS_URL = window.location.href.replace('4443', '4444').replace('https', 'wss')
 
 async function monitorAccelerometer(threshold) {
     const acl = new Accelerometer({frequency: 60.0})
@@ -32,11 +32,6 @@ function wait(ms) {
     return new Promise(resolve => {
         setTimeout(() => resolve(), ms);
     })
-}
-
-async function connectRtc() {
-    const connection = new RTCPeerConnection();
-
 }
 
 async function monitorTouch() {
@@ -97,12 +92,41 @@ async function monitorTouch() {
     })
 }
 
+function merge_buffers(b1, b2) {
+    const b_out = new Uint8Array(b1.byteLength + b2.byteLength);
+    b_out.set(new Uint8Array(b1), 0);
+    b_out.set(new Uint8Array(b2), b1.byteLength);
+    return b_out.buffer;
+};
+
 async function main() {
     // document.getElementById('config-form').addEventListener('submit', async (event) => {
     //     event.preventDefault();
     //     await arm()
     // })
     const connection = new WebSocket(WS_URL)
+
+    await new Promise((ok, reject) => {
+        connection.addEventListener('open', ok)
+        connection.addEventListener('error', reject)
+    })
+    const data_buffer = new ArrayBuffer(10020)
+    connection.send(data_buffer)
+    navigator.geolocation.watchPosition(pos => {
+        const tag = new Uint8Array([0]).buffer
+        const position = new Float64Array([
+            pos.coords.latitude,
+            pos.coords.longitude,
+            pos.coords.accuracy,
+            pos.coords.altitude,
+            pos.coords.altitudeAccuracy,
+            pos.coords.heading,
+            pos.coords.speed
+        ]).buffer
+        const frame_payload = merge_buffers(tag, position)
+        console.log(frame_payload)
+        connection.send(frame_payload)
+    })
 }
 
 async function arm() {

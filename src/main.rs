@@ -20,7 +20,7 @@ use tokio_rustls::TlsAcceptor;
 async fn handle_client(fut: upgrade::UpgradeFut) -> Result<()> {
     const CONNECTION_TIMEOUT: u64 = 10;
     const DEFUSE_TIMEOUT: u64 = 10;
-    const UPDATE_SIZE: usize = 17;
+    const UPDATE_SIZE: usize = 57;
 
     let mut ws = fut.await?;
     ws.set_writev(false);
@@ -89,6 +89,7 @@ async fn handle_client(fut: upgrade::UpgradeFut) -> Result<()> {
                 let payload = &*frame.payload;
                 ensure!(payload.len() == UPDATE_SIZE);
                 last_message.copy_from_slice(payload);
+                dbg!();
                 match payload[0] {
                     0 => defuse_timeout = None,
                     1 => {
